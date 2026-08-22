@@ -2,4 +2,4 @@
 
 This is my first attempt to deploy a website.
 
-+ I used [https://app.netlify.com/](netlify) to deploy it. The website is [https://dreamy-cat-dd6c5a.netlify.app/](here).
++ I used [netlify](https://app.netlify.com/) to deploy it. The website is [here](https://dreamy-cat-dd6c5a.netlify.app/).
