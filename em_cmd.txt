@@ -1,0 +1,8 @@
+em++ othello_AI.cpp -o out.js ^
+-s EXPORTED_FUNCTIONS="['_c_init','_c_put_piece','_get_turn','_get_board','_get_is_end','_get_sum_piece','_worker_ai_calc','_malloc','_free']" ^
+-s EXPORTED_RUNTIME_METHODS="['ccall','getValue','setValue']" ^
+-s ALLOW_MEMORY_GROWTH=1 ^
+-s NO_EXIT_RUNTIME=1 ^
+-s ENVIRONMENT="web,worker" ^
+-s WASM=1 ^
+-O0 -g
