@@ -5,4 +5,4 @@ em++ othello_AI.cpp -o out.js ^
 -s NO_EXIT_RUNTIME=1 ^
 -s ENVIRONMENT="web,worker" ^
 -s WASM=1 ^
--O0 -g
+-O2 -g

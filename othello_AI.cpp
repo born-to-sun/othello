@@ -144,6 +144,7 @@ void c_init() {
     init();
 }
 
+// 输入一份board副本，返回是否落子成功
 EMSCRIPTEN_KEEPALIVE
 int c_put_piece(int pos,int* ptr,int turn,int sum0,int sum1) {
     int k=0;
@@ -154,12 +155,12 @@ int c_put_piece(int pos,int* ptr,int turn,int sum0,int sum1) {
     int pos_x=(pos-1)/BOARD_SIZE,pos_y=(pos-1)%BOARD_SIZE+1;
     if(pos_x==0&&pos_y==0){
         board.pass();
-        return 1;
+        return true;
     }
     Board new_board=board;
-    if(!new_board.place_piece({pos_x,pos_y})) return 0;
+    if(!new_board.place_piece({pos_x,pos_y})) return false;
     board=new_board;
-    return 1;
+    return true;
 }
 
 EMSCRIPTEN_KEEPALIVE
@@ -170,7 +171,6 @@ int get_turn() {
 // 将board.board[1‑8][1‑8]拷贝到wasm堆ptr，JS读取，8*8=64个int
 EMSCRIPTEN_KEEPALIVE
 void get_board(int* ptr) {
-    cmd.print_board(::board);
     int k=0;
     for(int i=1;i<=8;i++){
         for(int j=1;j<=8;j++){
@@ -202,7 +202,6 @@ int worker_ai_calc(int* ptr,int turn,int sum0,int sum1){
     board.turn=turn;board.sum_piece[0]=sum0;board.sum_piece[1]=sum1;
     pair<int,int> pos = AI.AI_place(board);
     int x=pos.first,y=pos.second;
-    cmd.print_board(board);
     if(x==0&&y==0){
         board.pass();
     }
