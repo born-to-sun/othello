@@ -10,3 +10,17 @@ body{
     width: 60px;
     height: 60px;
 }
+.pass{
+    width: 60px;
+    height: 40px;
+    margin-left: 220px;
+    margin-top: 10px;
+    border-style: solid;
+    font-size: 18px;
+}
+.result{
+    margin-top: 10px;
+    font-size: 25px;
+    width: 512px;
+    text-align: center;
+}

@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>demo</title>
+        <title>黑白棋</title>
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
@@ -113,9 +113,9 @@
                 let result_node = document.getElementById("result");
                 
                 if(is_end){
-                    if(sum_piece[0] == sum_piece[1]) result_node.innerHTML = "Draw!";
-                    else if(sum_piece[0] > sum_piece[1]) result_node.innerHTML = "AI wins!";
-                    else result_node.innerHTML = "Human wins!";
+                    if(sum_piece[0] == sum_piece[1]) result_node.innerHTML = "平局！";
+                    else if(sum_piece[0] > sum_piece[1]) result_node.innerHTML = "AI 赢了！";
+                    else result_node.innerHTML = "你赢了！";
                 }
             }
         </script>
@@ -142,7 +142,7 @@
                 root.appendChild(br_node);
             }
         </script>
-        <button class="pass" type="button" onclick="send_msg(0,0)">pass</button>
-        <div id="result"></div>
+        <button class="pass" type="button" onclick="send_msg(0,0)">过</button>
+        <div id="result" class="result"></div>
     </body>
 </html>
