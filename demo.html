@@ -2,18 +2,16 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>黑白棋</title>
-        <link rel="icon" href="data:,">
+        <title>demo</title>
         <link rel="stylesheet" href="style.css">
     </head>
-    <body> 
-    <div id="container"></div>
-
+    <body>
+        <div id="board"></div>
         <script src="./out.js"></script>
         <script>
-            const start_x = 1000, start_y = 500, grid_width = 15;
+            const start_x = 1000, start_y = 500, grid_width = 60, grid_height = 60;
             // 0空，1白，2黑
-            const piece_style = ["grid", "piece_white", "piece_black"];
+            const piece_style = ["green", "white", "black"];
             const human_color=1;
             const AI_color=human_color^1;
             const human_turn = human_color;
@@ -32,7 +30,6 @@
                 }else if(e.data.type === "ai_result"){
                     // worker算完AI落子坐标 aiPos:0‑63；0代表pass
                     const pos = e.data.aiPos;
-                    console.log("AI put " + pos);
                     wasm_user_put(pos);
                     update();
                     is_get_pos = 1;
@@ -92,28 +89,60 @@
                 }
                 else is_get_pos = 1;
             }
-
+        </script>
+        <script>
+            function paint_piece(canvas_node, color){
+                let c = canvas_node.getContext("2d");
+                c.clearRect(0,0,canvas_node.width,canvas_node.height);
+                c.beginPath();
+                c.arc(grid_width/2,grid_height/2,15,0,2*Math.PI);
+                c.fillStyle = color;
+                c.fill();
+            }
             function paint_board(){
-                let html = "";
                 let k = 0;
                 for(let i = 1; i <= 8; i++){
                     for(let j = 1; j <= 8; j++){
-                        console.log(board[k]);
-                        let cls = piece_style[board[k] + 1];
-                        html += `<div class="${cls}" onclick="send_msg(${i},${j})">·</div>`;
+                        if(board[k] >= 0){//k>=0 means this pos is white or black
+                            let canvas_node = document.getElementById(`canvas(${i},${j})`);
+                            paint_piece(canvas_node, piece_style[board[k] + 1]);
+                        }
                         k++;
                     }
-                    html += `<div class="row-wrap"></div>`;
                 }
-                html += `<button class="pass" type="button" onclick="send_msg(0,0)">pass</button>`;
-                if(is_end){
-                    if(sum_piece[0] == sum_piece[1]) html += "<div>Draw!</div>";
-                    else if(sum_piece[0] > sum_piece[1]) html += "<div>AI wins</div>";
-                    else html += "<div>Human wins</div>";
-                }
+                let result_node = document.getElementById("result");
                 
-                document.getElementById("container").innerHTML = html;
+                if(is_end){
+                    if(sum_piece[0] == sum_piece[1]) result_node.innerHTML = "Draw!";
+                    else if(sum_piece[0] > sum_piece[1]) result_node.innerHTML = "AI wins!";
+                    else result_node.innerHTML = "Human wins!";
+                }
             }
         </script>
+        <script>
+            let root = document.getElementById("board");
+                    
+            for(let i = 1; i <= 8; i++){
+                for(let j = 1; j <= 8; j++){
+                    let div_node = document.createElement("div");
+                    div_node.className = "grid";
+                    div_node.id = `div(${i},${j})`;
+                    div_node.setAttribute("onclick",`send_msg(${i},${j})`);
+
+                    let canvas_node = document.createElement("canvas");
+                    canvas_node.id = `canvas(${i},${j})`;
+
+                    canvas_node.width = grid_width;
+                    canvas_node.height = grid_height;
+
+                    div_node.appendChild(canvas_node);
+                    root.appendChild(div_node);
+                }
+                let br_node = document.createElement("br");
+                root.appendChild(br_node);
+            }
+        </script>
+        <button class="pass" type="button" onclick="send_msg(0,0)">pass</button>
+        <div id="result"></div>
     </body>
 </html>
