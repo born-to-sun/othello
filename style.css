@@ -3,24 +3,31 @@ body{
 }
 .grid{
     background-color: green;
-    border-width: 3px 2px 3px;
+    border-width: 2px;
     border-style: solid;
     border-color: black;
     display: inline-block;
-    width: 60px;
-    height: 60px;
+    width: 65px;
+    height: 65px;
 }
 .pass{
     width: 60px;
     height: 40px;
-    margin-left: 220px;
-    margin-top: 10px;
+    margin-left: 240px;
     border-style: solid;
     font-size: 18px;
 }
 .result{
     margin-top: 10px;
     font-size: 25px;
-    width: 512px;
+    width: 550px;
     text-align: center;
+}
+.score_board{
+    font-size:25px;
+    width: 200px;
+    margin-top: 3px;
+    margin-left: 5px;
+    margin-bottom: 12px;
+    display: inline-block;
 }

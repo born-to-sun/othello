@@ -6,17 +6,24 @@
         <link rel="stylesheet" href="./style.css">
     </head>
     <body>
+        <div id="sum_piece1" class="score_board"></div>
+        <div id="sum_piece0" class="score_board"></div>
         <div id="board"></div>
+        <br/>
+        <button class="pass" type="button" onclick="send_msg(0,0)">过</button>
+        <div id="result" class="result"></div>
+        
         <script src="./out.js"></script>
         <script>
-            const start_x = 1000, start_y = 500, grid_width = 60, grid_height = 60;
+            const grid_width = 65, grid_height = 55, piece_radius = 20, piece_lst_radius = 5;
             // 0空，1白，2黑
             const piece_style = ["green", "white", "black"];
+            const piece_style_zh = ["白：", "黑："];
             const human_color=1;
             const AI_color=human_color^1;
             const human_turn = human_color;
             let board = new Array(64), sum_piece = [0,0];
-            let turn = 1, is_get_pos = 1, is_end = 0;
+            let turn = 1, is_get_pos = 1, is_end = 0, lst_pos_x = 0, lst_pos_y = 0;
 
             // worker对象
             const aiWorker = new Worker("./ai.worker.js");
@@ -52,7 +59,7 @@
                 aiWorker.postMessage({type:"ai_calc", boardArr:board, turn:turn, sum0:sum_piece[0], sum1:sum_piece[1]});
             }
 
-            // update函数：调用c++ get_turn get_board get_is_end get_sum_piece
+            // update函数：调用c++ get_turn get_board get_is_end get_sum_piece get_lst_pos_x get_lst_pos_y
             function update(){
                 // 1 get turn
                 turn = Module.ccall("get_turn","number",[],[]);
@@ -75,6 +82,10 @@
                 sum_piece[1] = Module.getValue(sumPtr + 1*4, 'i32');
                 Module._free(sumPtr);
 
+                //5 get_lst_pos
+                lst_pos_x = Module.ccall("get_lst_pos_x","number",[],[]);
+                lst_pos_y = Module.ccall("get_lst_pos_y","number",[],[]);
+
                 paint_board();
             }
             function send_msg(x, y){
@@ -91,13 +102,21 @@
             }
         </script>
         <script>
-            function paint_piece(canvas_node, color){
+            function paint_piece(canvas_node, color, is_lst){
                 let c = canvas_node.getContext("2d");
                 c.clearRect(0,0,canvas_node.width,canvas_node.height);
+
                 c.beginPath();
-                c.arc(grid_width/2,grid_height/2,15,0,2*Math.PI);
+                c.arc(grid_width/2,grid_width/2,piece_radius,0,2*Math.PI);
                 c.fillStyle = color;
                 c.fill();
+                if(is_lst){
+                    c.beginPath();
+                    c.arc(grid_width/2,grid_width/2,piece_lst_radius,0,2*Math.PI);
+                    c.fillStyle = "red";
+                    c.fill();
+                }
+                
             }
             function paint_board(){
                 let k = 0;
@@ -105,13 +124,17 @@
                     for(let j = 1; j <= 8; j++){
                         if(board[k] >= 0){//k>=0 means this pos is white or black
                             let canvas_node = document.getElementById(`canvas(${i},${j})`);
-                            paint_piece(canvas_node, piece_style[board[k] + 1]);
+                            paint_piece(canvas_node, piece_style[board[k] + 1], lst_pos_x == i && lst_pos_y == j);
                         }
                         k++;
                     }
                 }
                 let result_node = document.getElementById("result");
                 
+                for(let i = 0; i <= 1; i++){
+                    piece_node = document.getElementById("sum_piece" + i);
+                    piece_node.innerHTML = piece_style_zh[i] + sum_piece[i];
+                }
                 if(is_end){
                     if(sum_piece[0] == sum_piece[1]) result_node.innerHTML = "平局！";
                     else if(sum_piece[0] > sum_piece[1]) result_node.innerHTML = "AI 赢了！";
@@ -128,7 +151,7 @@
                     div_node.className = "grid";
                     div_node.id = `div(${i},${j})`;
                     div_node.setAttribute("onclick",`send_msg(${i},${j})`);
-
+                    
                     let canvas_node = document.createElement("canvas");
                     canvas_node.id = `canvas(${i},${j})`;
 
@@ -142,7 +165,6 @@
                 root.appendChild(br_node);
             }
         </script>
-        <button class="pass" type="button" onclick="send_msg(0,0)">过</button>
-        <div id="result" class="result"></div>
+        
     </body>
 </html>

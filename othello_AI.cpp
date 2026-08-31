@@ -13,19 +13,33 @@ constexpr bool AI_color=human_color^1;
 constexpr int INF=1e9;
 constexpr int dx[BOARD_SIZE]={-1,1,-1,1,1,0,-1,0};
 constexpr int dy[BOARD_SIZE]={-1,1,1,-1,0,1,0,-1};
+constexpr int score_list[BOARD_ARR_LEN][BOARD_ARR_LEN] = {
+    {},
+    {0, 20, 12, 12, 12, 12, 12, 12, 20}, 
+    {0, 12, 10, 10, 10, 10, 10, 10, 12},
+    {0, 12, 10, 10, 10, 10, 10, 10, 12},
+    {0, 12, 10, 10, 10, 10, 10, 10, 12},
+    {0, 12, 10, 10, 10, 10, 10, 10, 12},
+    {0, 12, 10, 10, 10, 10, 10, 10, 12},
+    {0, 12, 10, 10, 10, 10, 10, 10, 12},
+    {0, 20, 12, 12, 12, 12, 12, 12, 20},
+};
 struct Board{
     vector<vector<int> > board;//-1 empty, 0 white, 1 black
     vector<int> sum_piece;
+    vector<int> score;
     bool turn;
     pair<int,int> lst_pos;
     Board(){
         board=vector<vector<int> >(BOARD_ARR_LEN,vector<int>(BOARD_ARR_LEN));
         sum_piece.resize(2);
+        score.resize(2);
         turn=0;
         lst_pos={0,0};
     }
     void pass(){
         turn^=1;
+        lst_pos = {0,0};
     }
     void start(){
         turn=1;sum_piece[0]=sum_piece[1]=2;
@@ -42,13 +56,14 @@ struct Board{
         return 1<=pos&&pos<=BOARD_SIZE;
     }
     int calculate(int turn){//计算turn相比turn^1的优势
-        return sum_piece[turn]-sum_piece[turn^1];
+        return score[turn]-score[turn^1];
     }
     bool place_piece(pair<int,int> pos){
         int pos_x=pos.first,pos_y=pos.second;
         if(!in_board(pos_x)||!in_board(pos_y)) return 0;
         if(board[pos_x][pos_y]!=-1) return 0;
         sum_piece[turn]++;
+        score[turn]+=score_list[pos.first][pos.second];
         board[pos_x][pos_y]=turn;
         
         lst_pos={pos_x,pos_y};
@@ -67,6 +82,8 @@ struct Board{
                         is_flip=1;
                         board[new_x][new_y]=turn;
                         sum_piece[turn]++;sum_piece[turn^1]--;
+                        score[turn]+=score_list[new_x][new_y];
+                        score[turn^1]-=score_list[new_x][new_y];
                         new_x-=dx[i],new_y-=dy[i];
                     }
                     break;
@@ -184,6 +201,12 @@ int get_is_end() {
     return (int)board.is_end();
 }
 
+int get_lst_pos_x() {
+    return (int)board.lst_pos.first;
+}
+int get_lst_pos_y() {
+    return (int)board.lst_pos.second;
+}
 // sum_piece[0],sum_piece[1]写入ptr[0],ptr[1]
 EMSCRIPTEN_KEEPALIVE
 void get_sum_piece(int* ptr) {
